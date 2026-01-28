@@ -123,7 +123,7 @@
     .count{color:var(--muted);font-size:12px;white-space:nowrap;}
     .section{padding:0 12px 12px 12px;}
     .section h3{margin:10px 0 8px 0;font-size:13px;color:var(--accent2);letter-spacing:.2px;}
-    .tools{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));}
+    .tools{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
     .card{
       border:1px solid var(--line);border-radius:14px;background:var(--panel2);
       padding:10px 10px;display:flex;flex-direction:column;gap:6px;min-height:78px;
@@ -149,78 +149,31 @@
       color:var(--muted);font-size:12px;cursor:help;
     }
     .footer{padding:10px 16px 20px 16px;color:var(--muted);font-size:12px;max-width:1320px;margin:0 auto;}
-    @media (max-width: 860px){
-      .layout{grid-template-columns:1fr;}
-      nav{position:relative;top:0;height:auto;}
-      .tools{grid-template-columns:1fr;}
-    }
-  
-    /* --- Responsive upgrades (off-canvas nav + fluid type) --- */
+
+    /* --- Fluid typography (responsive text sizing) --- */
     .title h1{font-size:clamp(16px, 1.2vw + 12px, 20px);}
     .mainhead h2{font-size:clamp(15px, 1.1vw + 12px, 18px);}
     .subtitle{font-size:clamp(11.5px, .6vw + 9px, 13px);}
     .search input{font-size:clamp(13px, .6vw + 11px, 15px);}
     .btn{font-size:clamp(12px, .55vw + 10px, 13.5px);}
     .content{padding:clamp(12px, 1.2vw + 8px, 16px);}
-    .wrap{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));}
-    .layout{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));}
-
-    /* Tool cards: auto-fit columns where space allows */
-    .tools{grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));}
-
-    /* Off-canvas nav (mobile) */
-    .menuBtn{
-      display:none;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background: var(--panel2);
-      color: var(--muted);
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow: var(--shadow);
-    }
-    [data-theme="dark"] .menuBtn{box-shadow:none;background:rgba(18,26,43,.72);}
-
-    .overlay{
-      position:fixed;inset:0;
-      background:rgba(2,6,23,.55);
-      backdrop-filter: blur(2px);
-      z-index:40;
-      display:none;
-    }
-    body.navOpen .overlay{display:block;}
 
     @media (max-width: 860px){
-      .menuBtn{display:inline-flex;}
       .layout{grid-template-columns:1fr;}
-      nav{
-        position:fixed;
-        left:12px;
-        top:76px;
-        bottom:12px;
-        width:min(340px, calc(100vw - 24px));
-        height:auto;
-        transform: translateX(calc(-110% - 12px));
-        transition: transform .22s ease;
-        z-index:50;
-      }
-      body.navOpen nav{transform: translateX(0);}
-      main{min-height:calc(100vh - 170px);}
-      .controls{gap:10px;}
+      nav{position:relative;top:0;height:auto;}
+      .tools{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
       .search{min-width:0;width:100%;}
     }
-
-    @media (max-width: 520px){
-      .titleRow{align-items:flex-start;}
-      .controls{flex-direction:column;align-items:stretch;}
-      .btn, .menuBtn{width:100%;justify-content:center;}
-      nav{top:70px;}
+      nav{position:relative;top:0;height:auto;}
+      .tools{grid-template-columns:1fr;}
     }
-
+  
+    @media (max-width: 520px){
+      .controls{flex-direction:column;align-items:stretch;}
+      .btn{width:100%;justify-content:center;}
+      .search{width:100%;}
+      .titleRow{align-items:flex-start;}
+    }
   </style>
 </head>
 <body>
@@ -231,11 +184,6 @@
           <h1>Land Development Digital Directory</h1>
           <div class="subtitle">Stage-based dashboard with live search, tooltips, and light/dark mode.</div>
         </div>
-        
-        <button id="menuBtn" class="menuBtn" type="button" title="Open stages">
-          <span aria-hidden="true">☰</span>
-          <span>Stages</span>
-        </button>
         <button id="themeBtn" class="btn" type="button" title="Toggle theme">
           <span id="themeIcon">🌙</span>
           <span id="themeText">Dark mode</span>
@@ -253,8 +201,6 @@
       </div>
     </div>
   </header>
-
-  <div id="overlay" class="overlay" aria-hidden="true"></div>
 
   <div class="layout">
     <nav>
@@ -548,40 +494,6 @@ themeBtn.addEventListener("click", () => {
 renderNav();
 setHeader(0);
 renderMain(true);
-
-
-// --- Off-canvas nav (mobile) ---
-const menuBtn = document.getElementById("menuBtn");
-const overlay = document.getElementById("overlay");
-
-function setNavOpen(isOpen){
-  document.body.classList.toggle("navOpen", !!isOpen);
-  if (overlay) overlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
-}
-
-if (menuBtn){
-  menuBtn.addEventListener("click", () => setNavOpen(!document.body.classList.contains("navOpen")));
-}
-
-if (overlay){
-  overlay.addEventListener("click", () => setNavOpen(false));
-}
-
-// Close drawer when switching to desktop width
-window.addEventListener("resize", () => {
-  if (window.matchMedia("(min-width: 861px)").matches) setNavOpen(false);
-});
-
-// Close drawer after selecting a stage (mobile UX)
-const navEl = document.getElementById("nav");
-if (navEl){
-  navEl.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-    if (window.matchMedia("(max-width: 860px)").matches) setNavOpen(false);
-  });
-}
-
 </script>
 </body>
 </html>
