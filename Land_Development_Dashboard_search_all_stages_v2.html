@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Land Development Digital Directory</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --panel:#ffffff;
+      --panel2:#f6f7fb;
+      --text:#0f172a;
+      --muted:#475569;
+      --line:rgba(15,23,42,.12);
+      --accent:#2563eb;
+      --accent2:#0ea5e9;
+      --chip:rgba(37,99,235,.10);
+      --shadow:0 10px 30px rgba(2,6,23,.08);
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220;
+      --panel:rgba(18,26,43,.55);
+      --panel2:rgba(15,23,38,.65);
+      --text:#e8eefc;
+      --muted:#aab6d6;
+      --line:rgba(255,255,255,.09);
+      --accent:#4ea1ff;
+      --accent2:#7cdaff;
+      --chip:rgba(78,161,255,.14);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+    }
+    [data-theme="dark"] body{
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(78,161,255,.30), transparent 55%),
+        radial-gradient(900px 600px at 90% 0%, rgba(124,218,255,.20), transparent 50%),
+        var(--bg);
+    }
+    a{color:var(--accent2);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    header{
+      position:sticky;top:0;z-index:30;
+      background: color-mix(in oklab, var(--bg) 85%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1320px;margin:0 auto;padding:14px 16px;}
+    .titleRow{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .title{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+    .title h1{margin:0;font-size:18px;letter-spacing:.2px;}
+    .subtitle{color:var(--muted);font-size:12.5px;}
+    .controls{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .search{
+      flex:1;min-width:240px;display:flex;gap:8px;align-items:center;
+      padding:10px 12px;border:1px solid var(--line);border-radius:12px;
+      background: var(--panel2);
+      box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] .search{box-shadow:none;background:rgba(18,26,43,.72);}
+    .search input{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 12px;border:1px solid var(--line);border-radius:12px;
+      background: var(--panel2);
+      color: var(--muted);
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] .btn{box-shadow:none;background:rgba(18,26,43,.72);}
+    .layout{
+      max-width:1320px;margin:0 auto;padding:16px;
+      display:grid;grid-template-columns:260px 1fr;gap:14px;
+    }
+    nav{
+      border:1px solid var(--line);border-radius:16px;background:var(--panel);
+      overflow:hidden;position:sticky;top:92px;height:calc(100vh - 110px);
+      box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] nav{box-shadow:none;}
+    .navhead{padding:12px 12px 10px 12px;border-bottom:1px solid var(--line);background:var(--panel2);}
+    [data-theme="dark"] .navhead{background:rgba(15,23,38,.55);}
+    .navhead .small{color:var(--muted);font-size:12px;margin-top:4px;}
+    .navlist{overflow:auto;height:calc(100% - 58px);padding:6px;}
+    .navbtn{
+      width:100%;text-align:left;padding:10px 10px;border:1px solid transparent;
+      background:transparent;color:var(--text);border-radius:12px;cursor:pointer;
+      font-size:13px;line-height:1.2;
+    }
+    .navbtn:hover{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.18);}
+    [data-theme="dark"] .navbtn:hover{background:rgba(78,161,255,.10);border-color:rgba(78,161,255,.20);}
+    .navbtn.active{background:rgba(37,99,235,.12);border-color:rgba(37,99,235,.28);}
+    [data-theme="dark"] .navbtn.active{background:rgba(78,161,255,.18);border-color:rgba(78,161,255,.35);}
+    .navbtn .muted{display:block;color:var(--muted);font-size:11.5px;margin-top:3px;}
+    main{
+      border:1px solid var(--line);border-radius:16px;background:var(--panel);
+      overflow:hidden;box-shadow: var(--shadow);
+    }
+    [data-theme="dark"] main{box-shadow:none;}
+    .mainhead{padding:14px 14px 12px 14px;border-bottom:1px solid var(--line);background:var(--panel2);}
+    [data-theme="dark"] .mainhead{background:rgba(15,23,38,.55);}
+    .mainhead h2{margin:0;font-size:16px;}
+    .mainhead p{margin:6px 0 0 0;color:var(--muted);font-size:12.5px;line-height:1.35;}
+    .content{padding:14px;}
+    details.stage{
+      border:1px solid var(--line);border-radius:14px;background:color-mix(in oklab, var(--panel2) 85%, transparent);
+      margin-bottom:12px;overflow:hidden;
+    }
+    [data-theme="dark"] details.stage{background:rgba(15,23,38,.35);}
+    details.stage>summary{
+      list-style:none;cursor:pointer;padding:12px 12px;
+      display:flex;justify-content:space-between;align-items:center;gap:10px;
+    }
+    details.stage>summary::-webkit-details-marker{display:none;}
+    .stageTitle{font-weight:600;font-size:13.5px;}
+    .count{color:var(--muted);font-size:12px;white-space:nowrap;}
+    .section{padding:0 12px 12px 12px;}
+    .section h3{margin:10px 0 8px 0;font-size:13px;color:var(--accent2);letter-spacing:.2px;}
+    .tools{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));}
+    .card{
+      border:1px solid var(--line);border-radius:14px;background:var(--panel2);
+      padding:10px 10px;display:flex;flex-direction:column;gap:6px;min-height:78px;
+    }
+    [data-theme="dark"] .card{background:rgba(18,26,43,.55);}
+    .cardTop{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+    .name{
+      font-weight:600;font-size:13px;line-height:1.2;display:flex;
+      gap:8px;align-items:center;flex-wrap:wrap;
+    }
+    .desc{color:var(--muted);font-size:12.25px;line-height:1.35;}
+    .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;}
+    .chip{
+      padding:3px 8px;border-radius:999px;background:var(--chip);
+      border:1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+      color: color-mix(in oklab, var(--text) 90%, transparent);
+      font-size:11.5px;
+    }
+    [data-theme="dark"] .chip{border-color:rgba(78,161,255,.22);color:#d6e7ff;}
+    .tip{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:18px;height:18px;border-radius:999px;border:1px solid color-mix(in oklab, var(--text) 18%, transparent);
+      color:var(--muted);font-size:12px;cursor:help;
+    }
+    .footer{padding:10px 16px 20px 16px;color:var(--muted);font-size:12px;max-width:1320px;margin:0 auto;}
+    @media (max-width: 860px){
+      .layout{grid-template-columns:1fr;}
+      nav{position:relative;top:0;height:auto;}
+      .tools{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="titleRow">
+        <div class="title">
+          <h1>Land Development Digital Directory</h1>
+          <div class="subtitle">Stage-based dashboard with live search, tooltips, and light/dark mode.</div>
+        </div>
+        <button id="themeBtn" class="btn" type="button" title="Toggle theme">
+          <span id="themeIcon">🌙</span>
+          <span id="themeText">Dark mode</span>
+        </button>
+      </div>
+
+      <div class="controls">
+        <div class="search" title="Search within the current stage (or All Stages if selected).">
+          <span style="color:var(--muted);font-size:14px;">🔎</span>
+          <input id="q" type="text" placeholder="Search within selected stage — e.g., zoning, flood, underwriting…" />
+        </div>
+        <button id="expandBtn" class="btn" type="button" title="Expand or collapse all stage panels currently shown">
+          Expand all
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav>
+      <div class="navhead">
+        <div style="font-weight:700;">Development Stages</div>
+        <div class="small">Selecting a stage limits results to that stage only.</div>
+      </div>
+      <div id="nav" class="navlist"></div>
+    </nav>
+
+    <main>
+      <div class="mainhead">
+        <h2 id="stageTitle">All Stages</h2>
+        <p id="stageDesc">Use the left navigation to focus on a specific stage.</p>
+      </div>
+      <div id="main" class="content"></div>
+    </main>
+  </div>
+
+  <div class="footer"></div>
+
+<script>
+const DATA = [{"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Acres.com", "url": "https://www.acres.com/", "desc": "Land and rural property listings"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Aino", "url": "https://www.aino.world/", "desc": "AI for location data analysis"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "CivicStar", "url": "https://getcivicstar.ai/", "desc": "Pre-construction development intelligence"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "CommercialEdge", "url": "https://www.commercialedge.com/", "desc": "Commercial real estate listings and data"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "CoStar", "url": "https://www.costar.com/", "desc": "Commercial real estate market data and analytics"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "HelloData.ai", "url": "https://hellodata.ai/", "desc": "AI-driven automated rent and sales comps"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Homes.com", "url": "https://www.homes.com/", "desc": "Property search and real estate information"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "HouseCanary", "url": "https://www.housecanary.com/", "desc": "Predictive analytics for 130M+ residential properties"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Land.id", "url": "https://id.land/", "desc": "Property maps with parcel and utility overlays"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Landio", "url": "https://www.landio.com/", "desc": "Land listings marketplace"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "LoopNet", "url": "https://www.loopnet.com/", "desc": "Commercial real estate listings"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Pillar", "url": "https://www.pillarmarkets.com/", "desc": "AI-powered land acquisition and site selection for developers"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Placer.ai", "url": "https://www.placer.ai/", "desc": "Foot traffic analytics for feasibility"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Prophetic AI", "url": "https://www.propheticsoftware.ai/", "desc": "AI workflows for land acquisition"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "PropStream", "url": "https://www.propstream.com/", "desc": "ML-powered property search"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Realtor.com", "url": "https://www.realtor.com/", "desc": "Residential real estate listings and market data"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Reonomy", "url": "https://www.reonomy.com/", "desc": "Property intelligence for 54M+ commercial parcels"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Market Intelligence & Property Search", "name": "Zillow", "url": "https://www.zillow.com/", "desc": "Residential property valuations and listings"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "CBRE Research", "url": "https://www.cbre.com/insights/reports", "desc": "Global real estate market reports"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "Cushman & Wakefield Research", "url": "https://www.cushmanwakefield.com/en/insights", "desc": "Market research and reports"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "JLL Research", "url": "https://www.jll.com/en/trends-and-insights", "desc": "Real estate market intelligence"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "Reis", "url": "https://www.reis.com/", "desc": "Commercial real estate market trends (Moody's)"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "STR", "url": "https://str.com/", "desc": "Hospitality data benchmarking"}, {"stage": 1, "stage_title": "Initial Discovery & Market Scouting", "stage_desc": "Tools for identifying parcels, verifying market viability, and analyzing location data.", "section": "Data & Analytics Platforms", "name": "Yardi Matrix", "url": "https://www.yardimatrix.com/", "desc": "Multifamily and commercial market intelligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "ArchiWise AI", "url": "https://www.archiwise.ai/", "desc": "Zoning analysis and site insights"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "Deepblocks", "url": "https://deepblocks.com/", "desc": "Zoning capacity analysis for urban infill"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "LandLogic", "url": "https://www.landlogic.ai/", "desc": "AI for zoning and municipal standardized data (Canada)"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "PAXIV", "url": "https://paxiv.com/", "desc": "Complete parcel data, zoning analysis, and AI-generated feasibility reports"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "Plotzy", "url": "https://plotzy.ai/", "desc": "AI for zoning analysis in due diligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "ReadyPermit", "url": "https://readypermit.ai/", "desc": "Property intelligence and buildability analysis"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "RealReports", "url": "https://www.realreports.ai/", "desc": "AI-powered property reports; 'Carfax for land'"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "AI-Powered Zoning Analysis", "name": "ReZone", "url": "https://www.rezone.ai/", "desc": "AI for zoning updates and rezoning analysis"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "Citizenserve", "url": "https://www.citizenserve.com/", "desc": "Community development and permitting platform"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "GovPilot", "url": "https://www.govpilot.com/planning-and-zoning-software", "desc": "GIS-integrated zoning management"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "Gridics", "url": "https://gridics.com/", "desc": "Zoning data for upzoning scenarios"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "iWorQ", "url": "https://iworq.com/systems/planning-zoning-software/", "desc": "Comprehensive zoning and land use management"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "Municode", "url": "https://www.municode.com/", "desc": "Municipal codes and ordinances database"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "Municode Library", "url": "https://library.municode.com/", "desc": "Searchable municipal codes and ordinances"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "OpenGov Zoning", "url": "https://opengov.com/products/permitting-and-licensing/zoning-software/", "desc": "Interactive zoning maps"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Municipal Codes & Zoning Maps", "name": "Zoneomics", "url": "https://zoneomics.com/", "desc": "Zoning data platform with API and reports"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Blooma", "url": "https://www.blooma.ai/", "desc": "AI for commercial real estate lending and deal analysis"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Cherre", "url": "https://cherre.com/", "desc": "Universal Data Model connecting 3.3B+ addresses with AI"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Civils AI", "url": "https://www.civils.ai/", "desc": "AI for CRE data and due diligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Diald AI", "url": "https://www.diald.ai/", "desc": "AI-powered real estate due diligence scanning 1.7M+ data sources"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Enodo", "url": "https://www.enodoinc.com/", "desc": "Multifamily due diligence using predictive analytics"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "GreenLite", "url": "https://www.greenlite.com/", "desc": "AI for permitting and due diligence automation"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Imprima", "url": "https://www.imprima.com/", "desc": "AI for real estate due diligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Orbital Copilot", "url": "https://www.orbitalcopilot.com/", "desc": "AI for CRE legal due diligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "PDF.ai", "url": "https://pdf.ai/", "desc": "Extract data from PDFs for diligence"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "Proda AI", "url": "https://www.proda.ai/", "desc": "AI for rent roll data standardization"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "SurfaceAI", "url": "https://www.getsurface.ai/", "desc": "Financial due diligence AI"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "UrbanFootprint", "url": "https://urbanfootprint.com/", "desc": "Urban planning and scenario modeling"}, {"stage": 2, "stage_title": "Zoning & Regulatory Due Diligence", "stage_desc": "Tools for checking buildability, density limits, and zoning constraints.", "section": "Due Diligence Platforms", "name": "V7 Go", "url": "https://www.v7labs.com/", "desc": "AI-driven due diligence command center for M&A and real estate"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "National Land Cover Database", "url": "https://www.usgs.gov/centers/eros/science/national-land-cover-database", "desc": "Land cover classification"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "OpenTopography", "url": "https://www.opentopography.org/data", "desc": "High-resolution terrain datasets and point clouds"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "TIGER/Line Shapefiles", "url": "https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html", "desc": "Census boundary files"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "USDA Web Soil Survey", "url": "https://websoilsurvey.nrcs.usda.gov/", "desc": "Soil maps, drainage, and agricultural limitations"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "USGS Data", "url": "https://data.usgs.gov/", "desc": "Geospatial datasets repository"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "USGS LiDAR Explorer", "url": "https://apps.nationalmap.gov/lidar-explorer/", "desc": "LiDAR 3D elevation data coverage"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Soils & Terrain", "name": "USGS National Map Downloader", "url": "https://apps.nationalmap.gov/downloader/", "desc": "DEM, orthoimagery, and base data"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "EPA EnviroAtlas", "url": "https://www.epa.gov/enviroatlas", "desc": "Interactive environmental mapping"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "EPA Envirofacts", "url": "https://enviro.epa.gov/", "desc": "EPA environmental compliance and facility data"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "EPA Smart Growth Tools", "url": "https://www.epa.gov/smartgrowth/smart-growth-tools", "desc": "Sustainable development tools"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "FEMA Flood Map Service", "url": "https://msc.fema.gov/", "desc": "Official flood insurance rate maps and studies"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "FEMA NFHL Viewer", "url": "https://www.arcgis.com/apps/webappviewer/index.html?id=8b0adb51996444d4879338b5529aa9cd", "desc": "National Flood Hazard Layer interactive map"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "GRESB", "url": "https://www.gresb.com/", "desc": "ESG benchmarking and performance assessment"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "Partner ESI", "url": "https://www.partneresi.com/", "desc": "Environmental due diligence and Phase I ESA services"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "USFWS IPaC", "url": "https://www.fws.gov/service/information-planning-and-consultation", "desc": "Species list and conservation measures"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Environmental & Flood Assessment", "name": "USFWS Wetlands Mapper", "url": "https://www.fws.gov/program/national-wetlands-inventory/wetlands-mapper", "desc": "National Wetlands Inventory mapping"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Utilities & Infrastructure Mapping", "name": "4M Analytics", "url": "https://4manalytics.com/", "desc": "Subsurface utility mapping for land development"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Utilities & Infrastructure Mapping", "name": "811 / Call Before You Dig", "url": "https://call811.com/", "desc": "National utility location service"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Utilities & Infrastructure Mapping", "name": "Esri ArcGIS Utilities", "url": "https://www.esri.com/en-us/industries/water-utilities", "desc": "Utility mapping and asset management"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Utilities & Infrastructure Mapping", "name": "PointMan", "url": "https://pointman.com/", "desc": "Underground utility mapping and coordination"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Utilities & Infrastructure Mapping", "name": "USIC", "url": "https://www.usicllc.com/", "desc": "Utility locating and damage prevention services"}, {"stage": 3, "stage_title": "Physical & Environmental Site Assessment", "stage_desc": "Tools for verifying ground conditions, environmental constraints, and utilities.", "section": "Geospatial & Satellite Analysis", "name": "FlyPix AI", "url": "https://flypix.ai/", "desc": "Geospatial and land-use analysis via satellite imagery"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Archistar", "url": "https://www.archistar.ai/", "desc": "Property feasibility and permitting platform with GIS"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "ArkDesign", "url": "https://www.arkdesign.ai/", "desc": "AI schematic designs and feasibility reports"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Autodesk Forma", "url": "https://www.autodesk.com/products/forma/overview", "desc": "AI for urban planning with microclimate analysis"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Digital Blue Foam (DBF)", "url": "https://www.digitalbluefoam.com/", "desc": "Generative design and spatial analytics for urban planning"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Dzinly", "url": "https://www.dzinly.com/", "desc": "AI for exterior design and visualization"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Feasibly", "url": "https://www.feasibly.ai/", "desc": "Multi-agent AI for market and financial feasibility"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Hektar", "url": "https://www.parametric.se/product/hektar", "desc": "Early-stage generative planning tool for urban design"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Hypar", "url": "https://hypar.io/", "desc": "Building-as-code parametric design platform"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Maket", "url": "https://www.maket.ai/", "desc": "AI generative design with regulatory assistant"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "My Architect AI", "url": "https://www.myarchitectai.com/", "desc": "AI-aided architectural design software"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "qbiq", "url": "https://www.qbiq.ai/", "desc": "Automated architectural planning for test-fits"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Spacemaker AI", "url": "https://www.spacemaker.ai/", "desc": "Urban design and feasibility simulations (now part of Autodesk)"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Spacely AI", "url": "https://www.spacely.ai/", "desc": "AI interior and exterior visualization"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "TestFit", "url": "https://www.testfit.io/", "desc": "AI-driven site planning and rapid feasibility layouts"}, {"stage": 4, "stage_title": "Generative Massing & Initial Feasibility", "stage_desc": "Tools for testing layouts, generating options, and rapid design iterations.", "section": "AI Generative Design & Site Planning", "name": "Zenerate", "url": "https://www.zenerate.ai/", "desc": "AI feasibility studies and automated site plans"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Adventures in CRE", "url": "https://www.adventuresincre.com/", "desc": "Pro forma templates, courses, and development models"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Apers.app", "url": "https://www.apers.app/", "desc": "AI for real estate financial modeling and checklists"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Apartment DCF Calculator", "url": "https://apartmentpropertyvaluation.com/discounted-cash-flow-calculator", "desc": "Free DCF tool for multifamily"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Aprao", "url": "https://www.aprao.com/en-us/", "desc": "Automated pro forma generation and land valuation"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "ARGUS Enterprise", "url": "https://www.altusgroup.com/solutions/argus-enterprise/", "desc": "Industry standard CRE cash flow modeling"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Excel Real Estate (getrefm)", "url": "https://www.getrefm.com/", "desc": "Excel-based financial modeling add-in"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Feasibility.pro", "url": "https://www.feasibility.pro/", "desc": "Full development feasibility modeling"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Financial Mentor Calculator", "url": "https://www.financialmentor.com/calculator/real-estate-calculator", "desc": "Real estate investment calculators"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Property Metrics", "url": "https://propertymetrics.com/blog/discounted-cash-flow-analysis-real-estate/", "desc": "DCF analysis tools and educational guides"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "RealData", "url": "https://www.realdata.com/", "desc": "Professional pro forma and investment analysis software"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Rental Property Calculator", "url": "https://www.calculator.net/rental-property-calculator.html", "desc": "Analyze rental property potential"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Pro Forma & Investment Analysis", "name": "Valuate", "url": "https://www.valuatesoftware.com/", "desc": "Appraisal and valuation software for commercial real estate"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Economic & Market Data", "name": "ACS API", "url": "https://www.census.gov/programs-surveys/acs/data/data-via-api.html", "desc": "American Community Survey programmatic access"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Economic & Market Data", "name": "Bureau of Labor Statistics (BLS)", "url": "https://www.bls.gov/", "desc": "Employment, wages, and labor market data"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Economic & Market Data", "name": "data.census.gov", "url": "https://data.census.gov/", "desc": "Census demographic data portal"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Economic & Market Data", "name": "ESRI Business Analyst", "url": "https://www.esri.com/en-us/arcgis/products/arcgis-business-analyst/overview", "desc": "Demographic and market analysis with GIS"}, {"stage": 5, "stage_title": "Financial Modeling & Underwriting", "stage_desc": "Tools for assessing viability with DCF, pro formas, and investment analysis.", "section": "Economic & Market Data", "name": "FRED Economic Data", "url": "https://fred.stlouisfed.org/", "desc": "Federal Reserve economic indicators and interest rates"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Document Analysis & Lease Abstraction", "name": "Adventures in CRE Checklist", "url": "https://www.adventuresincre.com/product/development-checklist-tool/", "desc": "Comprehensive development due diligence checklist"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Document Analysis & Lease Abstraction", "name": "DealPath", "url": "https://www.dealpath.com/", "desc": "Scalable deal pipeline and due diligence management"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Document Analysis & Lease Abstraction", "name": "DealRoom", "url": "https://dealroom.net/industry/dealroom-for-real-estate", "desc": "Diligence management and collaboration platform"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Document Analysis & Lease Abstraction", "name": "LeaseLens", "url": "https://leaselens.ai/", "desc": "AI lease abstraction platform"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Document Analysis & Lease Abstraction", "name": "Manifest.ly", "url": "https://manifest.ly/", "desc": "Investor-focused due diligence checklists and workflows"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "Fastcase", "url": "https://www.fastcase.com/", "desc": "Legal research for real estate and land use cases"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "LegalZoom", "url": "https://www.legalzoom.com/", "desc": "Real estate legal documents and LLC formation"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "LexisNexis", "url": "https://www.lexisnexis.com/en-us/products/lexis-plus.page", "desc": "Comprehensive legal research database"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "Rocket Lawyer", "url": "https://www.rocketlawyer.com/", "desc": "Online legal documents for real estate"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "Title Research Online", "url": "https://www.titleresearchonline.com/", "desc": "Title research and property records search"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "Titleman", "url": "https://titleman.ai/", "desc": "AI platform for real estate title, valuation, and analysis"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Legal Research & Title", "name": "Westlaw", "url": "https://legal.thomsonreuters.com/en/products/westlaw", "desc": "Legal research platform"}, {"stage": 6, "stage_title": "Legal & Detailed Due Diligence Review", "stage_desc": "Tools for auditing documents, leases, titles, and legal compliance.", "section": "Building Codes & Compliance", "name": "ICC Digital Codes", "url": "https://codes.iccsafe.org/", "desc": "International building, fire, and safety codes online"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Archistar eCheck", "url": "https://www.archistar.ai/echeck/", "desc": "AI building permit compliance checking"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "BlitzPermits / Blitz AI", "url": "https://blitzpermits.ai/", "desc": "AI plan review and permitting compliance"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Blumen Systems", "url": "https://blumensystems.com/", "desc": "AI for infrastructure permitting"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "CivCheck", "url": "https://www.civcheck.ai/", "desc": "AI plan review for building permits"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Govstream.ai", "url": "https://www.govstream.ai/", "desc": "AI for smarter permitting workflows"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Infilla", "url": "https://www.infilla.com/", "desc": "AI for housing permitting acceleration"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "LandFinder.ai", "url": "https://www.landfinder.ai/", "desc": "AI for rezoning and entitlements"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Mercator.ai", "url": "https://www.mercator.ai/", "desc": "AI permit forecasting and timeline prediction"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "PermitAI", "url": "https://www.pnnl.gov/projects/permitai", "desc": "AI for environmental permitting (PNNL project)"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Permio.ai", "url": "https://www.permio.ai/", "desc": "AI-powered construction permitting platform"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "PermitFlow", "url": "https://www.permitflow.com/", "desc": "AI permitting software for construction"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "AI-Powered Permit & Plan Review", "name": "Shovels", "url": "https://www.shovels.ai/", "desc": "AI-powered building permit and contractor intelligence"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Permitting Platforms", "name": "Cloudpermit", "url": "https://cloudpermit.com/", "desc": "Cloud-based permitting and zoning platform"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Entitlement Consulting & Resources", "name": "Adventures in CRE Entitlements", "url": "https://www.adventuresincre.com/entitlement/", "desc": "Comprehensive guide to entitlement process"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Entitlement Consulting & Resources", "name": "Allied Development Guide", "url": "https://allieddev.com/press-3880/b/A-Guide-To-The-Land-Entitlement-Process", "desc": "Educational guide to land entitlement"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Entitlement Consulting & Resources", "name": "Consensus Planning", "url": "https://consensusplanning.com/", "desc": "Entitlement and planning consulting services"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Entitlement Consulting & Resources", "name": "Rutan & Tucker", "url": "https://www.rutan.com/practices/land-use-and-natural-resources/", "desc": "Land use and entitlement legal services"}, {"stage": 7, "stage_title": "Entitlements & Permitting Approval", "stage_desc": "Tools for securing build rights and navigating approval processes.", "section": "Entitlement Consulting & Resources", "name": "WGI Entitlements", "url": "https://wginc.com/entitlements-made-easy/", "desc": "Engineering and consulting for streamlining entitlements"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "ArchiVinci", "url": "https://www.archivinci.com/", "desc": "AI masterplan generator for large-scale planning"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "CITYPLAIN", "url": "https://www.cityplain.io/", "desc": "Urban planning AI for affordable housing challenges"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "CityBuildAR", "url": "https://www.mdpi.com/1999-5903/17/3/115", "desc": "Mobile AR app for community placemaking engagement (research project)"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "Enscape", "url": "https://enscape3d.com/", "desc": "Real-time rendering and VR for architects"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "Esri CityEngine", "url": "https://www.esri.com/arcgis/products/arcgis-cityengine/overview", "desc": "Procedural generative urban massing and 3D city modeling"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "Lumion", "url": "https://lumion3d.com/", "desc": "3D rendering for architecture"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "Tripo AI", "url": "https://www.tripo3d.ai/", "desc": "Generative 3D modeling for urban scenes"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "Twinmotion", "url": "https://www.twinmotion.com/", "desc": "Real-time 3D immersion software"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "UrbanistAI", "url": "https://site.urbanistai.com/", "desc": "Participatory AI for collaborative urban planning"}, {"stage": 8, "stage_title": "Urban Planning & Pre-Build Placemaking", "stage_desc": "Tools for visualizing designs, engaging communities, and urban design.", "section": "Urban Planning AI & Visualization", "name": "UrbanSim", "url": "https://www.urbansim.com/", "desc": "AI application for real estate urban design planning"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "Deloitte Tokenization Overview", "url": "https://www.deloitte.com/us/en/insights/industry/financial-services/financial-services-industry-predictions/2025/tokenized-real-estate.html", "desc": "Why tokenization matters for real estate"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "RealBlocks", "url": "https://www.realblocks.com/", "desc": "Tokenized fund platforms for US real estate"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "RedSwan", "url": "https://www.redswan.io/", "desc": "Commercial real estate tokenization with secondary market trading"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "StegX", "url": "https://stegx.finance/", "desc": "Institutional marketplace for tokenized real estate on Hedera"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "Tokeny", "url": "https://tokeny.com/", "desc": "Permissioned token infrastructure for compliant tokenization"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "tZERO", "url": "https://www.tzero.com/", "desc": "Regulated ATS for tokenized real estate securities"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Institutional Tokenization Platforms", "name": "Zoniqx", "url": "https://www.zoniqx.com/", "desc": "Enterprise tokenization with ERC-7518 standard for compliant real estate"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Binaryx", "url": "https://binaryx.io/", "desc": "International rental property tokenization with Wyoming DAO LLCs"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Blockimmo", "url": "https://www.blockimmo.ch/", "desc": "Swiss platform for tokenized real estate shares"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Brickblock", "url": "https://www.brickblock.io/", "desc": "Residential and commercial real estate tokenization"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "DigiShares", "url": "https://www.digishares.io/", "desc": "White-label tokenization for real estate across 40+ countries"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Homebase", "url": "https://www.homebase.app/", "desc": "Fractional home ownership starting at $100"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "HoneyBricks", "url": "https://honeybricks.com/", "desc": "Multifamily real estate tokenization for passive investing"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Lofty", "url": "https://www.lofty.ai/", "desc": "Fractional property tokenization (formerly on Algorand)"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Myco", "url": "https://myco.io/", "desc": "Co-owning real estate assets through tokenization"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Propy", "url": "https://propy.com/", "desc": "Blockchain platform for tokenized real estate closings with on-chain deeds"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Qarat", "url": "https://qarat.io/", "desc": "Dubai commercial real estate tokenization"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "RealEstateMall (REM)", "url": "https://www.realestate-mall.io/", "desc": "UAE luxury and commercial tokenization with DeFi"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "RealT", "url": "https://realt.co/", "desc": "Fractional real estate tokenization on Ethereum with daily dividends"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "Slice", "url": "https://www.slicere.com/", "desc": "Cross-border commercial real estate tokenization"}, {"stage": 9, "stage_title": "Advanced Financing & Asset Tokenization", "stage_desc": "Tools for raising capital digitally, fractional ownership, and blockchain.", "section": "Fractional Ownership Platforms", "name": "SolidBlock", "url": "https://www.solidblock.co/", "desc": "Luxury property tokenization (tokenized St. Regis Aspen)"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Construction Management & Progress Tracking", "name": "Bluebeam Revu", "url": "https://www.bluebeam.com/solutions/revu/", "desc": "PDF editing and markup for construction documents"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Construction Management & Progress Tracking", "name": "OpenSpace", "url": "https://www.openspace.ai/", "desc": "AI site capture for construction progress documentation"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Construction Management & Progress Tracking", "name": "PlanGrid", "url": "https://www.plangrid.com/", "desc": "Blueprint and construction document management (Autodesk)"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Construction Management & Progress Tracking", "name": "Procore", "url": "https://www.procore.com/", "desc": "Construction project management and collaboration"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Construction Management & Progress Tracking", "name": "TraceAir", "url": "https://www.traceair.net/", "desc": "Drone-powered site intelligence and progress tracking"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Design & Engineering Software", "name": "AutoCAD", "url": "https://www.autodesk.com/products/autocad/", "desc": "CAD design software for 2D and 3D drafting"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Design & Engineering Software", "name": "Autodesk Civil 3D", "url": "https://www.autodesk.com/products/civil-3d/", "desc": "Civil engineering design and documentation"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Design & Engineering Software", "name": "Bentley Systems", "url": "https://www.bentley.com/", "desc": "Infrastructure engineering software"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Design & Engineering Software", "name": "Revit", "url": "https://www.autodesk.com/products/revit/overview", "desc": "BIM software for architecture and construction"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Design & Engineering Software", "name": "SketchUp", "url": "https://www.sketchup.com/", "desc": "3D modeling CAD software"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "AppFolio", "url": "https://www.appfolio.com/", "desc": "Property management for residential and commercial"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "Buildium", "url": "https://www.buildium.com/", "desc": "Property management for HOA and residential communities"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "Entrata", "url": "https://www.entrata.com/", "desc": "Property management software"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "MRI Software", "url": "https://www.mrisoftware.com/", "desc": "Enterprise property management for commercial portfolios"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "Rezi", "url": "https://getrezi.com/", "desc": "Rent payment and resident engagement"}, {"stage": 10, "stage_title": "Construction, Operations & Management", "stage_desc": "Tools for building, tracking progress, and managing properties.", "section": "Property Management Software", "name": "Yardi", "url": "https://www.yardi.com/", "desc": "Comprehensive property management and accounting software"}, {"stage": 11, "stage_title": "Site Selection & Demographics", "stage_desc": "Tools for location analysis and demographic research.", "section": "", "name": "ESRI Business Analyst", "url": "https://www.esri.com/en-us/arcgis/products/arcgis-business-analyst/overview", "desc": "Demographic and market analysis with GIS (repeated for relevance)"}, {"stage": 11, "stage_title": "Site Selection & Demographics", "stage_desc": "Tools for location analysis and demographic research.", "section": "", "name": "PolicyMap", "url": "https://www.policymap.com/", "desc": "Data and mapping for community development"}, {"stage": 11, "stage_title": "Site Selection & Demographics", "stage_desc": "Tools for location analysis and demographic research.", "section": "", "name": "SiteSelection.com", "url": "https://siteselection.com/", "desc": "Corporate site selection resources"}, {"stage": 12, "stage_title": "Transportation & Accessibility", "stage_desc": "Tools for location analysis and transit access.", "section": "", "name": "Google Maps API", "url": "https://developers.google.com/maps", "desc": "Mapping and location services"}, {"stage": 12, "stage_title": "Transportation & Accessibility", "stage_desc": "Tools for location analysis and transit access.", "section": "", "name": "Mapbox", "url": "https://www.mapbox.com/", "desc": "Custom maps and location data"}, {"stage": 12, "stage_title": "Transportation & Accessibility", "stage_desc": "Tools for location analysis and transit access.", "section": "", "name": "WalkScore", "url": "https://www.walkscore.com/", "desc": "Walkability, transit, and bike scores"}, {"stage": 13, "stage_title": "Climate Risk & Resilience", "stage_desc": "Tools for climate and hazard risk assessment.", "section": "", "name": "CoreLogic", "url": "https://www.corelogic.com/", "desc": "Property data with hazard risk"}, {"stage": 13, "stage_title": "Climate Risk & Resilience", "stage_desc": "Tools for climate and hazard risk assessment.", "section": "", "name": "First Street Foundation", "url": "https://firststreet.org/", "desc": "Climate risk data and flood factors"}, {"stage": 13, "stage_title": "Climate Risk & Resilience", "stage_desc": "Tools for climate and hazard risk assessment.", "section": "", "name": "Jupiter Intelligence", "url": "https://jupiterintel.com/", "desc": "Climate risk analytics"}, {"stage": 14, "stage_title": "Environmental & Sustainability", "stage_desc": "Tools for green building and environmental compliance.", "section": "", "name": "Energy Star Portfolio Manager", "url": "https://www.energystar.gov/buildings/tools-and-resources/portfolio-manager", "desc": "Track building energy performance"}, {"stage": 14, "stage_title": "Environmental & Sustainability", "stage_desc": "Tools for green building and environmental compliance.", "section": "", "name": "LEED Online", "url": "https://www.usgbc.org/leed", "desc": "Green building certification"}, {"stage": 14, "stage_title": "Environmental & Sustainability", "stage_desc": "Tools for green building and environmental compliance.", "section": "", "name": "Phius", "url": "https://www.phius.org/", "desc": "Passive house certification"}, {"stage": 14, "stage_title": "Environmental & Sustainability", "stage_desc": "Tools for green building and environmental compliance.", "section": "", "name": "WaterSense", "url": "https://www.epa.gov/watersense", "desc": "Water efficiency program"}, {"stage": 15, "stage_title": "Appraisal & Valuation", "stage_desc": "Tools for property valuation and appraisal services.", "section": "", "name": "ClearCapital", "url": "https://www.clearcapital.com/", "desc": "Residential valuation and analytics"}, {"stage": 15, "stage_title": "Appraisal & Valuation", "stage_desc": "Tools for property valuation and appraisal services.", "section": "", "name": "Collateral Analytics", "url": "https://www.collateralanalytics.com/", "desc": "Automated valuation models"}, {"stage": 16, "stage_title": "Capital Markets & Lending", "stage_desc": "Tools for investment and lending platforms.", "section": "", "name": "Auction.com", "url": "https://www.auction.com/", "desc": "Real estate auction platform"}, {"stage": 16, "stage_title": "Capital Markets & Lending", "stage_desc": "Tools for investment and lending platforms.", "section": "", "name": "Crexi", "url": "https://www.crexi.com/", "desc": "Commercial real estate marketplace"}, {"stage": 16, "stage_title": "Capital Markets & Lending", "stage_desc": "Tools for investment and lending platforms.", "section": "", "name": "Ten-X", "url": "https://www.ten-x.com/", "desc": "Commercial real estate online marketplace"}, {"stage": 17, "stage_title": "Market Comps & Pricing", "stage_desc": "Tools for comparable sales and market pricing.", "section": "", "name": "CompStak", "url": "https://compstak.com/", "desc": "Commercial real estate comps database"}, {"stage": 18, "stage_title": "Survey & Land Measurement", "stage_desc": "Tools for professional surveying resources.", "section": "", "name": "SurveyMonkey", "url": "https://www.surveymonkey.com/", "desc": "Community surveys and feedback"}, {"stage": 19, "stage_title": "Procurement & Bidding", "stage_desc": "Tools for construction procurement and bid management.", "section": "", "name": "BuildingConnected", "url": "https://www.buildingconnected.com/", "desc": "Construction bid management (Autodesk)"}, {"stage": 20, "stage_title": "Insurance & Risk", "stage_desc": "Tools for property and construction insurance.", "section": "", "name": "The Hartford", "url": "https://www.thehartford.com/", "desc": "Commercial property insurance"}, {"stage": 20, "stage_title": "Insurance & Risk", "stage_desc": "Tools for property and construction insurance.", "section": "", "name": "Travelers", "url": "https://www.travelers.com/", "desc": "Construction and property insurance"}, {"stage": 20, "stage_title": "Insurance & Risk", "stage_desc": "Tools for property and construction insurance.", "section": "", "name": "Zurich", "url": "https://www.zurich.com/", "desc": "Risk management and insurance"}, {"stage": 21, "stage_title": "Community Impact & Social", "stage_desc": "Tools for social responsibility and community engagement.", "section": "", "name": "B Corp Certification", "url": "https://www.bcorporation.net/", "desc": "Social and environmental performance certification"}, {"stage": 21, "stage_title": "Community Impact & Social", "stage_desc": "Tools for social responsibility and community engagement.", "section": "", "name": "Impact Management Project", "url": "https://impactmanagementproject.com/", "desc": "Impact measurement standards"}, {"stage": 21, "stage_title": "Community Impact & Social", "stage_desc": "Tools for social responsibility and community engagement.", "section": "", "name": "JUST Capital", "url": "https://justcapital.com/", "desc": "Corporate stakeholder capitalism metrics"}, {"stage": 22, "stage_title": "Infrastructure & Smart Cities", "stage_desc": "Tools for digital twins and infrastructure engineering.", "section": "", "name": "CityZenith", "url": "https://cityzenith.com/", "desc": "Digital twin platform for smart cities"}, {"stage": 22, "stage_title": "Infrastructure & Smart Cities", "stage_desc": "Tools for digital twins and infrastructure engineering.", "section": "", "name": "Matterport", "url": "https://matterport.com/", "desc": "3D capture and digital creation"}, {"stage": 22, "stage_title": "Infrastructure & Smart Cities", "stage_desc": "Tools for digital twins and infrastructure engineering.", "section": "", "name": "NavVis", "url": "https://www.navvis.com/", "desc": "Indoor spatial intelligence"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "CBRE Economic Advisors", "url": "https://www.cbre.com/insights/books/economic-development-handbook", "desc": "Economic development market research"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "EconDevShow Tools", "url": "https://tools.econdevshow.com/", "desc": "Comprehensive directory of economic development tools"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "IEDC Resources", "url": "https://www.iedconline.org/pages/resources/", "desc": "International Economic Development Council best practices"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "Sanborn Maps", "url": "https://www.sanborn.com/", "desc": "Historical property information and mapping services"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "SelectUSA", "url": "https://www.trade.gov/selectusa-resources-and-information", "desc": "Federal program for business investment"}, {"stage": 23, "stage_title": "Broader Knowledge Resources", "stage_desc": "Tools for economic development, federal data, and market research.", "section": "", "name": "U.S. EDA Tools", "url": "https://www.eda.gov/resources/tools", "desc": "Economic Development Administration resources"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "AI21 Labs", "url": "https://www.ai21.com/", "desc": "Advanced AI for document analysis"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "AI for CRE Collective", "url": "https://aiforcrecollective.com/", "desc": "Community and education platform for AI in commercial real estate"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Anthropic API", "url": "https://www.anthropic.com/", "desc": "Claude AI for custom integrations"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "ChatGPT", "url": "https://chatgpt.com/", "desc": "General-purpose AI for analysis, writing, and research"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Claude", "url": "https://claude.ai/", "desc": "Anthropic AI assistant for deep research and analysis"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Cursor", "url": "https://cursor.com/", "desc": "AI-first code editor for building custom tools and automation"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Gemini", "url": "https://gemini.google.com/", "desc": "Google multimodal AI assistant"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Genspark", "url": "https://www.genspark.ai/", "desc": "AI-powered search and knowledge engine"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Grok", "url": "https://grok.x.ai/", "desc": "xAI assistant with real-time information access"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "NotebookLM", "url": "https://notebooklm.google.com/", "desc": "Google's AI-powered research and note-taking assistant"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "OpenAI API", "url": "https://openai.com/api/", "desc": "GPT models for custom applications"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Perplexity", "url": "https://www.perplexity.ai/", "desc": "AI-powered answer engine with web-backed research"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Replit", "url": "https://replit.com/", "desc": "AI-powered collaborative coding platform"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "DALL-E", "url": "https://openai.com/dall-e-3", "desc": "AI image generation from OpenAI"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Midjourney", "url": "https://www.midjourney.com/", "desc": "AI image generation for visualization concepts"}, {"stage": 24, "stage_title": "General AI Support", "stage_desc": "", "section": "Broad AI tools supporting all stages (e.g., analysis, research, coding).", "name": "Stable Diffusion", "url": "https://stability.ai/", "desc": "Open-source AI image generation"}];
+
+const STAGES = (() => {
+  const m = new Map();
+  for (const t of DATA) {
+    if (!m.has(t.stage)) m.set(t.stage, { title: t.stage_title, desc: t.stage_desc || "" });
+  }
+  return Array.from(m.entries()).sort((a,b)=>a[0]-b[0]).map(([stage, info]) => ({stage, ...info}));
+})();
+
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function normalize(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function startsWithAnyWord(hay, term) {
+  if (!term) return false;
+  const h = normalize(hay);
+  const t = normalize(term);
+  if (!h || !t) return false;
+  if (h.startsWith(t)) return true;
+  const words = h.split(" ").filter(Boolean);
+  return words.some(w => w.startsWith(t));
+}
+
+function matchesTool(t, term) {
+  if (!term) return true;
+  const n = normalize(term);
+  const name = t.name || "";
+  const desc = t.desc || "";
+  const section = t.section || "";
+  const stageTitle = t.stage_title || "";
+  // Prefer prefix-style matches, but allow substring matches too.
+  return (
+    startsWithAnyWord(name, n) ||
+    startsWithAnyWord(section, n) ||
+    startsWithAnyWord(stageTitle, n) ||
+    normalize(desc).includes(n) ||
+    normalize(name).includes(n) ||
+    normalize(section).includes(n) ||
+    normalize(stageTitle).includes(n)
+  );
+}
+
+
+function tagFromText(t) {
+  const s = (t || "").toLowerCase();
+  if (s.includes("ai")) return "AI";
+  if (s.includes("gis") || s.includes("map") || s.includes("arcgis") || s.includes("lidar")) return "GIS";
+  if (s.includes("permit") || s.includes("zoning") || s.includes("code")) return "Regulatory";
+  if (s.includes("underwrit") || s.includes("pro forma") || s.includes("dcf") || s.includes("lending")) return "Finance";
+  if (s.includes("construction") || s.includes("bim") || s.includes("cad")) return "Build";
+  return "";
+}
+
+let selectedStage = 0; // 0 = all stages
+
+const qEl = document.getElementById("q");
+const navEl = document.getElementById("nav");
+const mainEl = document.getElementById("main");
+const stageTitleEl = document.getElementById("stageTitle");
+const stageDescEl = document.getElementById("stageDesc");
+const expandBtn = document.getElementById("expandBtn");
+
+function setHeader(stage) {
+  if (!stage) {
+    stageTitleEl.textContent = "All Stages";
+    stageDescEl.textContent = "Use the left navigation to focus on a specific stage.";
+    return;
+  }
+  const info = STAGES.find(s => s.stage === stage);
+  stageTitleEl.textContent = info ? `Stage ${stage}: ${info.title}` : `Stage ${stage}`;
+  stageDescEl.textContent = (info && info.desc) ? info.desc : "";
+}
+
+function renderNav() {
+  const totalCount = DATA.length;
+  const btn = (stage, label, sub, active) => `
+    <button class="navbtn ${active ? "active" : ""}" data-stage="${stage}">
+      ${escapeHtml(label)}
+      <span class="muted">${escapeHtml(sub)}</span>
+    </button>
+  `;
+
+  const allBtn = btn(0, "All Stages", `${totalCount} total tools`, selectedStage === 0);
+
+  const stageBtns = STAGES.map(s => {
+    const count = DATA.filter(t => t.stage === s.stage).length;
+    return btn(s.stage, `Stage ${s.stage}: ${s.title}`, `${count} tools`, selectedStage === s.stage);
+  }).join("");
+
+  navEl.innerHTML = allBtn + stageBtns;
+
+  navEl.querySelectorAll("button[data-stage]").forEach(b => {
+    b.addEventListener("click", () => {
+      selectedStage = Number(b.getAttribute("data-stage"));
+      qEl.value = ""; // reset search on stage change for clarity
+      setHeader(selectedStage);
+      renderNav();
+      renderMain(true);
+    });
+  });
+}
+
+function filterData() {
+  const term = qEl.value.trim();
+  // IMPORTANT: when the user is searching, show matches across ALL stages (not only the selected stage)
+  const base = term ? DATA : (selectedStage === 0 ? DATA : DATA.filter(t => t.stage === selectedStage));
+
+  if (!term) return base;
+
+  return base.filter(t => matchesTool(t, term));
+}
+
+function renderCards(arr) {
+  return arr.map(t => {
+    const tip = escapeHtml((t.name ? t.name + ": " : "") + (t.desc || ""));
+    const chip = tagFromText((t.section||"") + " " + (t.desc||"") + " " + (t.name||""));
+    const chipHtml = chip ? `<span class="chip">${escapeHtml(chip)}</span>` : "";
+    const stageChip = selectedStage === 0 ? `<span class="chip">Stage ${t.stage}</span>` : "";
+    return `
+      <div class="card">
+        <div class="cardTop">
+          <div class="name">
+            <a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.name)}</a>
+            <span class="tip" title="${tip}">i</span>
+          </div>
+        </div>
+        <div class="desc">${escapeHtml(t.desc || "")}</div>
+        <div class="meta">
+          ${stageChip}
+          ${chipHtml}
+          ${t.section ? `<span class="chip">${escapeHtml(t.section)}</span>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderStageBlock(stage, toolsForStage, forceOpen=true) {
+  const bySec = new Map();
+  for (const t of toolsForStage) {
+    const sec = (t.section || "Tools").trim() || "Tools";
+    if (!bySec.has(sec)) bySec.set(sec, []);
+    bySec.get(sec).push(t);
+  }
+  for (const [sec, arr] of bySec) arr.sort((a,b)=>a.name.localeCompare(b.name));
+
+  const sectionsHtml = Array.from(bySec.entries()).map(([sec, arr]) => `
+      <div class="section">
+        <h3>${escapeHtml(sec)}</h3>
+        <div class="tools">${renderCards(arr)}</div>
+      </div>
+  `).join("");
+
+  const stageInfo = STAGES.find(s => s.stage === stage);
+  const title = stageInfo ? `Stage ${stage}: ${stageInfo.title}` : `Stage ${stage}`;
+  const count = toolsForStage.length;
+
+  return `
+    <details class="stage" ${forceOpen ? "open" : ""}>
+      <summary>
+        <div class="stageTitle">${escapeHtml(title)}</div>
+        <div class="count">${count} tools</div>
+      </summary>
+      ${sectionsHtml}
+    </details>
+  `;
+}
+
+function renderMain(openAllOnRender=false) {
+  const filtered = filterData();
+  if (filtered.length === 0) {
+    mainEl.innerHTML = `<div style="color:var(--muted);padding:10px 2px;">No matches. Try broader keywords (e.g., "zoning", "flood", "DCF", "permit").</div>`;
+    return;
+  }
+
+  
+  const termNow = qEl.value.trim();
+  if (termNow) {
+    // Flat, all-stages results while searching (supports partial names like "pro")
+    const total = filtered.length;
+    stageTitleEl.textContent = "Search results";
+    stageDescEl.textContent = `${total} match(es) across all stages. Clear the search box to return to stage view.`;
+
+    // Rank: name prefix > section prefix > substring
+    const tnorm = normalize(termNow);
+    const ranked = filtered.map(t => {
+      const n = normalize(t.name || "");
+      const s = normalize(t.section || "");
+      let score = 0;
+      if (n.startsWith(tnorm)) score += 300;
+      else if (n.split(" ").some(w => w.startsWith(tnorm))) score += 250;
+      if (s.startsWith(tnorm)) score += 120;
+      const ndx = n.indexOf(tnorm);
+      if (ndx >= 0) score += Math.max(0, 100 - ndx);
+      return { t, score };
+    }).sort((a,b)=> b.score - a.score || a.t.stage - b.t.stage || a.t.name.localeCompare(b.t.name));
+
+    const cards = ranked.map(x => x.t);
+    mainEl.innerHTML = `<div class="tools">${renderCards(cards)}</div>`;
+
+    // Expand/collapse button not meaningful for flat view
+    expandBtn.textContent = "Expand all";
+    return;
+  }
+const stagesToRender = selectedStage === 0
+    ? Array.from(new Set(filtered.map(t => t.stage))).sort((a,b)=>a-b)
+    : [selectedStage];
+
+  const forceOpen = true; // open by default
+  mainEl.innerHTML = stagesToRender.map(stage => {
+    const toolsForStage = filtered.filter(t => t.stage === stage);
+    return renderStageBlock(stage, toolsForStage, forceOpen);
+  }).join("");
+
+  // Update expand/collapse button state label
+  const anyClosed = Array.from(mainEl.querySelectorAll("details.stage")).some(d => !d.open);
+  expandBtn.textContent = anyClosed ? "Expand all" : "Collapse all";
+}
+
+qEl.addEventListener("input", () => renderMain(false));
+
+expandBtn.addEventListener("click", () => {
+  const details = Array.from(mainEl.querySelectorAll("details.stage"));
+  const anyClosed = details.some(d => !d.open);
+  for (const d of details) d.open = anyClosed;
+  expandBtn.textContent = anyClosed ? "Collapse all" : "Expand all";
+});
+
+// Theme toggle (default: light)
+const root = document.documentElement;
+const themeBtn = document.getElementById("themeBtn");
+const themeIcon = document.getElementById("themeIcon");
+const themeText = document.getElementById("themeText");
+
+function applyTheme(theme) {
+  root.setAttribute("data-theme", theme);
+  localStorage.setItem("ld_theme", theme);
+  if (theme === "dark") {
+    themeIcon.textContent = "☀️";
+    themeText.textContent = "Light mode";
+  } else {
+    themeIcon.textContent = "🌙";
+    themeText.textContent = "Dark mode";
+  }
+}
+
+const saved = localStorage.getItem("ld_theme");
+applyTheme(saved === "dark" ? "dark" : "light");
+
+themeBtn.addEventListener("click", () => {
+  const current = root.getAttribute("data-theme") || "light";
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
+// Initial render
+renderNav();
+setHeader(0);
+renderMain(true);
+</script>
+</body>
+</html>
