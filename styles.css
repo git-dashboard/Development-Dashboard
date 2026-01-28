@@ -187,4 +187,11 @@
       nav{top:70px;}
     }
 
+  
+    /* --- Scroll behavior: allow whole page to scroll (no inner scroll panels) --- */
+    html, body{height:auto; overflow:auto;}
+    body{min-height:100vh;}
+    .layout{height:auto; min-height:0;}
+    nav, main{height:auto; overflow:visible;}
+
   </style>
