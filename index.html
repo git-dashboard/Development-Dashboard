@@ -155,40 +155,12 @@
       .tools{grid-template-columns:1fr;}
     }
   
-    /* --- Responsive upgrades (off-canvas nav + fluid type) --- */
-    .title h1{font-size:clamp(16px, 1.2vw + 12px, 20px);}
-    .mainhead h2{font-size:clamp(15px, 1.1vw + 12px, 18px);}
-    .subtitle{font-size:clamp(11.5px, .6vw + 9px, 13px);}
-    .search input{font-size:clamp(13px, .6vw + 11px, 15px);}
-    .btn{font-size:clamp(12px, .55vw + 10px, 13.5px);}
-    .content{padding:clamp(12px, 1.2vw + 8px, 16px);}
-    .wrap{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));}
-    .layout{padding-left:max(16px, env(safe-area-inset-left));padding-right:max(16px, env(safe-area-inset-right));}
-
-    /* Tool cards: auto-fit columns where space allows */
-    .tools{grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));}
-
-    /* Off-canvas nav (mobile) */
-    .menuBtn{
-      display:none;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background: var(--panel2);
-      color: var(--muted);
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
-      box-shadow: var(--shadow);
-    }
-    [data-theme="dark"] .menuBtn{box-shadow:none;background:rgba(18,26,43,.72);}
-
+    /* --- Mobile stages drawer (keeps "All Stages" as main view) --- */
+    .menuBtn{display:none;}
     .overlay{
       position:fixed;inset:0;
       background:rgba(2,6,23,.55);
-      backdrop-filter: blur(2px);
+      backdrop-filter:blur(2px);
       z-index:40;
       display:none;
     }
@@ -197,27 +169,27 @@
     @media (max-width: 860px){
       .menuBtn{display:inline-flex;}
       .layout{grid-template-columns:1fr;}
+      /* Off-canvas nav */
       nav{
         position:fixed;
         left:12px;
         top:76px;
         bottom:12px;
-        width:min(340px, calc(100vw - 24px));
+        width:min(360px, calc(100vw - 24px));
         height:auto;
-        transform: translateX(calc(-110% - 12px));
-        transition: transform .22s ease;
+        transform:translateX(calc(-110% - 12px));
+        transition:transform .22s ease;
         z-index:50;
       }
-      body.navOpen nav{transform: translateX(0);}
+      body.navOpen nav{transform:translateX(0);}
       main{min-height:calc(100vh - 170px);}
-      .controls{gap:10px;}
+      .tools{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
       .search{min-width:0;width:100%;}
     }
-
     @media (max-width: 520px){
-      .titleRow{align-items:flex-start;}
       .controls{flex-direction:column;align-items:stretch;}
-      .btn, .menuBtn{width:100%;justify-content:center;}
+      .btn{width:100%;justify-content:center;}
+      .search{width:100%;}
       nav{top:70px;}
     }
 
@@ -232,7 +204,7 @@
           <div class="subtitle">Stage-based dashboard with live search, tooltips, and light/dark mode.</div>
         </div>
         
-        <button id="menuBtn" class="menuBtn" type="button" title="Open stages">
+        <button id="menuBtn" class="btn menuBtn" type="button" title="Open Development Stages">
           <span aria-hidden="true">☰</span>
           <span>Stages</span>
         </button>
@@ -549,38 +521,40 @@ renderNav();
 setHeader(0);
 renderMain(true);
 
+// --- Mobile "Development Stages" drawer ---
+(function(){
+  const menuBtn = document.getElementById("menuBtn");
+  const overlay = document.getElementById("overlay");
+  const navEl = document.getElementById("nav");
 
-// --- Off-canvas nav (mobile) ---
-const menuBtn = document.getElementById("menuBtn");
-const overlay = document.getElementById("overlay");
+  function setNavOpen(isOpen){
+    document.body.classList.toggle("navOpen", !!isOpen);
+    if (overlay) overlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+  }
 
-function setNavOpen(isOpen){
-  document.body.classList.toggle("navOpen", !!isOpen);
-  if (overlay) overlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
-}
+  if (menuBtn){
+    menuBtn.addEventListener("click", () => {
+      setNavOpen(!document.body.classList.contains("navOpen"));
+    });
+  }
+  if (overlay){
+    overlay.addEventListener("click", () => setNavOpen(false));
+  }
 
-if (menuBtn){
-  menuBtn.addEventListener("click", () => setNavOpen(!document.body.classList.contains("navOpen")));
-}
+  // Close drawer when selecting a stage (mobile)
+  if (navEl){
+    navEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      if (window.matchMedia("(max-width: 860px)").matches) setNavOpen(false);
+    });
+  }
 
-if (overlay){
-  overlay.addEventListener("click", () => setNavOpen(false));
-}
-
-// Close drawer when switching to desktop width
-window.addEventListener("resize", () => {
-  if (window.matchMedia("(min-width: 861px)").matches) setNavOpen(false);
-});
-
-// Close drawer after selecting a stage (mobile UX)
-const navEl = document.getElementById("nav");
-if (navEl){
-  navEl.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-    if (window.matchMedia("(max-width: 860px)").matches) setNavOpen(false);
+  // If user rotates / resizes back to desktop, ensure drawer is closed.
+  window.addEventListener("resize", () => {
+    if (window.matchMedia("(min-width: 861px)").matches) setNavOpen(false);
   });
-}
+})();
 
 </script>
 </body>
